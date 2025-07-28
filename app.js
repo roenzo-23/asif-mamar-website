@@ -30,6 +30,9 @@ class SkillSwapApp {
                 });
             }
 
+            // Small delay to allow all systems to initialize
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // Initialize systems in order
             await this.initializeSystems();
             
@@ -61,23 +64,49 @@ class SkillSwapApp {
      * Initialize all application systems
      */
     async initializeSystems() {
-        // Wait for all systems to be available
-        const maxWaitTime = 5000; // 5 seconds
+        // Wait for all systems to be available with shorter timeout and better checks
+        const maxWaitTime = 2000; // 2 seconds instead of 5
         const startTime = Date.now();
+        const checkInterval = 50; // Check every 50ms
         
-        while (!window.authSystem || !window.locationSystem || !window.dashboardSystem) {
+        while (!this.areSystemsReady()) {
             if (Date.now() - startTime > maxWaitTime) {
-                throw new Error('Timeout waiting for systems to initialize');
+                // Log which systems are missing for debugging
+                const missing = [];
+                if (!window.authSystem) missing.push('authSystem');
+                if (!window.locationSystem) missing.push('locationSystem');
+                if (!window.dashboardSystem) missing.push('dashboardSystem');
+                
+                console.warn('Some systems not ready:', missing);
+                // Continue anyway with available systems
+                break;
             }
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
         }
         
-        // Store system references
-        this.systems.auth = window.authSystem;
-        this.systems.location = window.locationSystem;
-        this.systems.dashboard = window.dashboardSystem;
+        // Store system references for available systems
+        this.systems.auth = window.authSystem || null;
+        this.systems.location = window.locationSystem || null;
+        this.systems.dashboard = window.dashboardSystem || null;
         
-        console.log('✅ All systems loaded and ready');
+        console.log('✅ Systems loaded:', {
+            auth: !!this.systems.auth,
+            location: !!this.systems.location,
+            dashboard: !!this.systems.dashboard
+        });
+    }
+
+    /**
+     * Check if all required systems are ready
+     * @returns {boolean} True if all systems are available
+     */
+    areSystemsReady() {
+        return window.authSystem && 
+               window.locationSystem && 
+               window.dashboardSystem &&
+               window.authSystem.isInitialized &&
+               window.locationSystem.isInitialized &&
+               window.dashboardSystem.isInitialized;
     }
 
     /**
@@ -197,7 +226,7 @@ class SkillSwapApp {
     checkFirstTimeUser() {
         const hasVisited = localStorage.getItem('skillswap_has_visited');
         
-        if (!hasVisited && !this.systems.auth.isLoggedIn()) {
+        if (!hasVisited && this.systems.auth && !this.systems.auth.isLoggedIn()) {
             localStorage.setItem('skillswap_has_visited', 'true');
             
             setTimeout(() => {
@@ -256,9 +285,8 @@ class SkillSwapApp {
         document.body.classList.toggle('mobile', isMobile);
         
         // Trigger resize events for other systems
-        if (this.systems.location) {
-            // Re-setup location inputs if needed
-            this.systems.location.setupLocationInputs();
+        if (this.systems.location && this.systems.location.refresh) {
+            this.systems.location.refresh();
         }
     }
 
@@ -280,7 +308,7 @@ class SkillSwapApp {
         
         const statusType = isOnline ? 'success' : 'warning';
         
-        if (this.systems.auth) {
+        if (this.systems.auth && this.systems.auth.showToast) {
             this.systems.auth.showToast(statusMessage, statusType);
         }
         
@@ -300,8 +328,8 @@ class SkillSwapApp {
             console.log('Page visible');
             
             // Refresh data if user has been away for a while
-            if (this.systems.auth.isLoggedIn()) {
-                this.systems.dashboard?.refresh();
+            if (this.systems.auth && this.systems.auth.isLoggedIn() && this.systems.dashboard) {
+                this.systems.dashboard.refresh();
             }
         }
     }
@@ -322,7 +350,7 @@ class SkillSwapApp {
         console.error('Global error occurred:', error, 'at', filename, ':', lineno);
         
         // Show user-friendly error message
-        if (this.systems.auth) {
+        if (this.systems.auth && this.systems.auth.showToast) {
             this.systems.auth.showToast(
                 'An unexpected error occurred. Please refresh the page if problems persist.', 
                 'error'
@@ -337,7 +365,7 @@ class SkillSwapApp {
         console.error('Unhandled promise rejection:', reason);
         
         // Show user-friendly error message
-        if (this.systems.auth) {
+        if (this.systems.auth && this.systems.auth.showToast) {
             this.systems.auth.showToast(
                 'Something went wrong. Please try again.', 
                 'error'
@@ -425,7 +453,7 @@ class SkillSwapApp {
      * Open edit profile modal (keyboard shortcut handler)
      */
     openEditProfile() {
-        if (this.systems.auth.isLoggedIn() && this.systems.dashboard) {
+        if (this.systems.auth && this.systems.auth.isLoggedIn() && this.systems.dashboard) {
             this.systems.dashboard.showEditProfileModal();
         }
     }

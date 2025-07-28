@@ -9,8 +9,14 @@ class LocationSuggestionSystem {
         this.activeSuggestions = null;
         this.debounceTimer = null;
         this.debounceDelay = 300; // milliseconds
+        this.isInitialized = false;
         
-        this.init();
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     /**
@@ -20,6 +26,8 @@ class LocationSuggestionSystem {
     init() {
         this.setupLocationInputs();
         this.setupGlobalClickHandler();
+        this.isInitialized = true;
+        console.log('✅ Location system initialized');
     }
 
     /**
@@ -108,6 +116,11 @@ class LocationSuggestionSystem {
         }
 
         // Get location suggestions from data.js
+        if (typeof getLocationSuggestions !== 'function') {
+            console.warn('getLocationSuggestions function not available');
+            return;
+        }
+
         const suggestions = getLocationSuggestions(searchQuery);
 
         if (suggestions.length === 0) {
@@ -348,6 +361,7 @@ class LocationSuggestionSystem {
      * @returns {boolean} Whether the location is valid
      */
     validateLocation(location) {
+        if (typeof CITIES_DATABASE === 'undefined') return true; // Fallback
         const normalizedLocation = location.toLowerCase().trim();
         return CITIES_DATABASE.some(city => 
             city.toLowerCase() === normalizedLocation
@@ -363,14 +377,17 @@ class LocationSuggestionSystem {
             input.value = '';
         });
     }
+
+    /**
+     * Refresh the system (re-setup inputs)
+     */
+    refresh() {
+        this.setupLocationInputs();
+    }
 }
 
-// Initialize the location suggestion system when DOM is loaded
-let locationSystem;
-
-document.addEventListener('DOMContentLoaded', () => {
-    locationSystem = new LocationSuggestionSystem();
-});
+// Initialize the location suggestion system
+let locationSystem = new LocationSuggestionSystem();
 
 // Make locationSystem globally accessible for other modules
 window.locationSystem = locationSystem;

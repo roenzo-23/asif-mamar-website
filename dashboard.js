@@ -10,8 +10,14 @@ class DashboardSystem {
         this.filteredUsers = [];
         this.searchDebounceTimer = null;
         this.searchDebounceDelay = 500;
+        this.isInitialized = false;
         
-        this.init();
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     /**
@@ -21,6 +27,8 @@ class DashboardSystem {
     init() {
         this.setupEventListeners();
         this.setupEditProfileModal();
+        this.isInitialized = true;
+        console.log('✅ Dashboard system initialized');
     }
 
     /**
@@ -96,9 +104,13 @@ class DashboardSystem {
         if (!this.currentUser) return;
 
         // Update profile information
-        document.getElementById('profileName').textContent = this.currentUser.name;
-        document.getElementById('profileLocation').textContent = this.currentUser.location;
-        document.getElementById('profileEmail').textContent = this.currentUser.email;
+        const profileName = document.getElementById('profileName');
+        const profileLocation = document.getElementById('profileLocation');
+        const profileEmail = document.getElementById('profileEmail');
+        
+        if (profileName) profileName.textContent = this.currentUser.name;
+        if (profileLocation) profileLocation.textContent = this.currentUser.location;
+        if (profileEmail) profileEmail.textContent = this.currentUser.email;
 
         // Display skills
         this.displaySkills('skillsOffered', this.currentUser.skillsOffered, 'offered');
@@ -148,7 +160,9 @@ class DashboardSystem {
         }
 
         // Sort users by skill match relevance
-        this.allUsers = sortUsersByRelevance(this.allUsers, this.currentUser);
+        if (typeof sortUsersByRelevance === 'function') {
+            this.allUsers = sortUsersByRelevance(this.allUsers, this.currentUser);
+        }
         
         this.filteredUsers = [...this.allUsers];
     }
@@ -161,7 +175,14 @@ class DashboardSystem {
         if (!locationFilter) return;
 
         // Get unique locations from all users
-        const uniqueLocations = getUniqueLocations(this.allUsers);
+        let uniqueLocations = [];
+        if (typeof getUniqueLocations === 'function') {
+            uniqueLocations = getUniqueLocations(this.allUsers);
+        } else {
+            // Fallback if function not available
+            const locations = this.allUsers.map(user => user.location);
+            uniqueLocations = [...new Set(locations)].sort();
+        }
         
         // Clear existing options (except "All Locations")
         locationFilter.innerHTML = '<option value="">All Locations</option>';
@@ -200,10 +221,23 @@ class DashboardSystem {
         const locationFilter = document.getElementById('locationFilter')?.value || '';
 
         // Apply filters using data.js functions
-        this.filteredUsers = searchUsers(this.allUsers, skillQuery, locationFilter);
+        if (typeof searchUsers === 'function') {
+            this.filteredUsers = searchUsers(this.allUsers, skillQuery, locationFilter);
+        } else {
+            // Fallback filtering
+            this.filteredUsers = this.allUsers.filter(user => {
+                const skillMatch = !skillQuery || 
+                    [...user.skillsOffered, ...user.skillsWanted]
+                        .some(skill => skill.toLowerCase().includes(skillQuery.toLowerCase()));
+                const locationMatch = !locationFilter || user.location === locationFilter;
+                return skillMatch && locationMatch;
+            });
+        }
         
         // Re-sort by relevance after filtering
-        this.filteredUsers = sortUsersByRelevance(this.filteredUsers, this.currentUser);
+        if (typeof sortUsersByRelevance === 'function') {
+            this.filteredUsers = sortUsersByRelevance(this.filteredUsers, this.currentUser);
+        }
         
         // Display filtered results
         this.displayUsers();
@@ -254,7 +288,7 @@ class DashboardSystem {
             <i class="fas fa-search"></i>
             <h3>No users found</h3>
             <p>Try adjusting your search criteria or location filter</p>
-            <button class="btn btn-outline" onclick="this.closest('.empty-state').parentNode.querySelector('#searchSkills').value = ''; this.closest('.empty-state').parentNode.querySelector('#locationFilter').value = ''; window.dashboardSystem.applyFilters();">
+            <button class="btn btn-outline" onclick="document.getElementById('searchSkills').value = ''; document.getElementById('locationFilter').value = ''; window.dashboardSystem.applyFilters();">
                 Clear Filters
             </button>
         `;
@@ -348,19 +382,25 @@ class DashboardSystem {
         if (!this.currentUser) return;
 
         const modal = document.getElementById('editProfileModal');
+        if (!modal) return;
         
         // Populate form with current user data
-        document.getElementById('editName').value = this.currentUser.name;
-        document.getElementById('editLocation').value = this.currentUser.location;
-        document.getElementById('editSkillsOffered').value = this.currentUser.skillsOffered.join(', ');
-        document.getElementById('editSkillsWanted').value = this.currentUser.skillsWanted.join(', ');
+        const editName = document.getElementById('editName');
+        const editLocation = document.getElementById('editLocation');
+        const editSkillsOffered = document.getElementById('editSkillsOffered');
+        const editSkillsWanted = document.getElementById('editSkillsWanted');
+        
+        if (editName) editName.value = this.currentUser.name;
+        if (editLocation) editLocation.value = this.currentUser.location;
+        if (editSkillsOffered) editSkillsOffered.value = this.currentUser.skillsOffered.join(', ');
+        if (editSkillsWanted) editSkillsWanted.value = this.currentUser.skillsWanted.join(', ');
         
         // Show modal
         modal.classList.remove('hidden');
         
         // Focus on first input
         setTimeout(() => {
-            document.getElementById('editName').focus();
+            if (editName) editName.focus();
         }, 100);
     }
 
@@ -369,7 +409,9 @@ class DashboardSystem {
      */
     hideEditProfileModal() {
         const modal = document.getElementById('editProfileModal');
-        modal.classList.add('hidden');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
     }
 
     /**
@@ -379,10 +421,10 @@ class DashboardSystem {
     handleEditProfile(e) {
         e.preventDefault();
 
-        const name = document.getElementById('editName').value.trim();
-        const location = document.getElementById('editLocation').value.trim();
-        const skillsOffered = document.getElementById('editSkillsOffered').value.trim();
-        const skillsWanted = document.getElementById('editSkillsWanted').value.trim();
+        const name = document.getElementById('editName')?.value?.trim() || '';
+        const location = document.getElementById('editLocation')?.value?.trim() || '';
+        const skillsOffered = document.getElementById('editSkillsOffered')?.value?.trim() || '';
+        const skillsWanted = document.getElementById('editSkillsWanted')?.value?.trim() || '';
 
         // Validation
         if (!name || name.length < 2) {
@@ -496,11 +538,7 @@ class DashboardSystem {
 }
 
 // Initialize dashboard system
-let dashboardSystem;
-
-document.addEventListener('DOMContentLoaded', () => {
-    dashboardSystem = new DashboardSystem();
-});
+let dashboardSystem = new DashboardSystem();
 
 // Make dashboardSystem globally accessible
 window.dashboardSystem = dashboardSystem;

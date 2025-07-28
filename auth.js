@@ -10,8 +10,14 @@ class AuthSystem {
             users: 'skillswap_users',
             currentUser: 'skillswap_current_user'
         };
+        this.isInitialized = false;
         
-        this.init();
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     /**
@@ -22,6 +28,8 @@ class AuthSystem {
         this.setupEventListeners();
         this.checkExistingSession();
         this.initializeSampleUsers();
+        this.isInitialized = true;
+        console.log('✅ Auth system initialized');
     }
 
     /**
@@ -92,7 +100,7 @@ class AuthSystem {
      */
     initializeSampleUsers() {
         const existingUsers = this.getStoredUsers();
-        if (existingUsers.length === 0) {
+        if (existingUsers.length === 0 && typeof SAMPLE_USERS !== 'undefined') {
             // Store sample users in localStorage
             localStorage.setItem(this.storageKeys.users, JSON.stringify(SAMPLE_USERS));
         }
@@ -407,7 +415,7 @@ class AuthSystem {
         document.getElementById('dashboardPage').classList.add('active');
         
         // Load dashboard data
-        if (window.dashboardSystem) {
+        if (window.dashboardSystem && window.dashboardSystem.isInitialized) {
             window.dashboardSystem.loadDashboard();
         }
     }
@@ -428,15 +436,20 @@ class AuthSystem {
      */
     updateUIForLoggedInUser() {
         // Hide login/signup buttons
-        document.getElementById('loginBtn').classList.add('hidden');
-        document.getElementById('signupBtn').classList.add('hidden');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (signupBtn) signupBtn.classList.add('hidden');
         
         // Show user menu
         const userMenu = document.getElementById('userMenu');
-        userMenu.classList.remove('hidden');
+        if (userMenu) userMenu.classList.remove('hidden');
         
         // Update user name
-        document.getElementById('userName').textContent = this.currentUser.name;
+        const userName = document.getElementById('userName');
+        if (userName && this.currentUser) {
+            userName.textContent = this.currentUser.name;
+        }
     }
 
     /**
@@ -444,11 +457,14 @@ class AuthSystem {
      */
     updateUIForLoggedOutUser() {
         // Show login/signup buttons
-        document.getElementById('loginBtn').classList.remove('hidden');
-        document.getElementById('signupBtn').classList.remove('hidden');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (signupBtn) signupBtn.classList.remove('hidden');
         
         // Hide user menu
-        document.getElementById('userMenu').classList.add('hidden');
+        const userMenu = document.getElementById('userMenu');
+        if (userMenu) userMenu.classList.add('hidden');
     }
 
     /**
@@ -457,6 +473,7 @@ class AuthSystem {
      * @param {string} loadingText - Text to show while loading
      */
     setButtonLoading(button, loadingText) {
+        if (!button) return;
         button.disabled = true;
         button.dataset.originalText = button.textContent;
         button.textContent = loadingText;
@@ -468,6 +485,7 @@ class AuthSystem {
      * @param {HTMLElement} button - Button element
      */
     removeButtonLoading(button) {
+        if (!button) return;
         button.disabled = false;
         button.textContent = button.dataset.originalText || 'Submit';
         button.classList.remove('loading');
@@ -481,8 +499,12 @@ class AuthSystem {
      */
     showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
+        if (!toast) return;
+        
         const toastMessage = toast.querySelector('.toast-message');
         const toastIcon = toast.querySelector('.toast-icon');
+        
+        if (!toastMessage || !toastIcon) return;
         
         // Set message
         toastMessage.textContent = message;
@@ -528,11 +550,7 @@ class AuthSystem {
 }
 
 // Initialize authentication system
-let authSystem;
-
-document.addEventListener('DOMContentLoaded', () => {
-    authSystem = new AuthSystem();
-});
+let authSystem = new AuthSystem();
 
 // Make authSystem globally accessible
 window.authSystem = authSystem;
