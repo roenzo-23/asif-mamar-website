@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillSwap - Learn Together, Grow Together</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/animations.css">
+    <title>SkillSwap - Learn & Teach Skills</title>
+    <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -17,175 +15,55 @@
                 <i class="fas fa-exchange-alt"></i>
                 <span>SkillSwap</span>
             </div>
-            <div class="nav-menu">
-                <a href="#home" class="nav-link active" data-section="home">Home</a>
-                <a href="#search" class="nav-link" data-section="search">Find Skills</a>
-                <a href="#matches" class="nav-link" data-section="matches">Matches</a>
-                <a href="#chat" class="nav-link" data-section="chat">Chat</a>
-                <a href="#profile" class="nav-link" data-section="profile">Profile</a>
-            </div>
             <div class="nav-actions">
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="btn btn-primary" id="loginBtn">Login</button>
-                <button class="btn btn-secondary" id="registerBtn">Register</button>
+                <button class="btn btn-outline" id="loginBtn">Login</button>
+                <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                <!-- User menu (hidden by default) -->
                 <div class="user-menu hidden" id="userMenu">
-                    <img src="" alt="Profile" class="user-avatar" id="userAvatar">
-                    <span class="user-name" id="userName"></span>
+                    <span id="userName"></span>
                     <button class="btn btn-outline" id="logoutBtn">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Home Section -->
-        <section id="home" class="section active">
-            <div class="hero">
-                <div class="hero-content">
-                    <h1 class="hero-title">Learn Together, Grow Together</h1>
-                    <p class="hero-subtitle">Connect with people to exchange skills and knowledge in your community</p>
-                    <div class="hero-actions">
-                        <button class="btn btn-primary btn-large" id="getStartedBtn">Get Started</button>
-                        <button class="btn btn-outline btn-large" id="learnMoreBtn">Learn More</button>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    <canvas id="connectionGraph" width="400" height="300"></canvas>
+    <!-- Landing Page -->
+    <section id="landingPage" class="page">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Learn Together, Grow Together</h1>
+                <p>Connect with people to exchange skills and knowledge in your community</p>
+                <div class="hero-actions">
+                    <button class="btn btn-large btn-primary" id="heroSignupBtn">Get Started</button>
+                    <button class="btn btn-large btn-outline" id="heroLoginBtn">Login</button>
                 </div>
             </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-users"></i>
+                <h3>Find Skill Partners</h3>
+                <p>Connect with people who can teach you and learn from you</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Share Your Knowledge</h3>
+                <p>Teach others and expand your skill network</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Local Community</h3>
+                <p>Find skill partners in your area</p>
+            </div>
+        </div>
+    </section>
 
-            <div class="home-stats">
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <span class="stat-number" id="totalUsers">0</span>
-                    <span class="stat-label">Active Users</span>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-handshake"></i>
-                    <span class="stat-number" id="totalConnections">0</span>
-                    <span class="stat-label">Connections Made</span>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span class="stat-number" id="totalSkills">0</span>
-                    <span class="stat-label">Skills Shared</span>
-                </div>
-            </div>
-
-            <div class="featured-section">
-                <h2>Latest Active Users</h2>
-                <div class="user-grid" id="latestUsers"></div>
-            </div>
-
-            <div class="featured-section">
-                <h2>Featured Skills</h2>
-                <div class="skill-tags" id="featuredSkills"></div>
-            </div>
-        </section>
-
-        <!-- Search Section -->
-        <section id="search" class="section">
-            <div class="search-header">
-                <h2>Find Your Perfect Skill Match</h2>
-                <div class="search-controls">
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search by skill..." id="skillSearch">
-                    </div>
-                    <div class="filter-controls">
-                        <select id="locationFilter">
-                            <option value="">All Locations</option>
-                        </select>
-                        <select id="skillTypeFilter">
-                            <option value="">All Skills</option>
-                            <option value="offered">Skills Offered</option>
-                            <option value="wanted">Skills Wanted</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="search-results" id="searchResults"></div>
-        </section>
-
-        <!-- Matches Section -->
-        <section id="matches" class="section">
-            <div class="matches-header">
-                <h2>Your Skill Matches</h2>
-                <p>People who can teach you what you want to learn, and want to learn what you can teach</p>
-            </div>
-            <div class="matches-grid" id="matchesGrid"></div>
-        </section>
-
-        <!-- Chat Section -->
-        <section id="chat" class="section">
-            <div class="chat-container">
-                <div class="chat-sidebar">
-                    <h3>Conversations</h3>
-                    <div class="chat-list" id="chatList"></div>
-                </div>
-                <div class="chat-main">
-                    <div class="chat-header" id="chatHeader">
-                        <span>Select a conversation</span>
-                    </div>
-                    <div class="chat-messages" id="chatMessages"></div>
-                    <div class="chat-input">
-                        <input type="text" placeholder="Type a message..." id="messageInput">
-                        <button class="btn btn-primary" id="sendMessage">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Profile Section -->
-        <section id="profile" class="section">
-            <div class="profile-container" id="profileContainer">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <img src="" alt="Profile" id="profileAvatar">
-                        <button class="edit-avatar" id="editAvatar">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="profile-info">
-                        <h2 id="profileName"></h2>
-                        <p id="profileLocation"></p>
-                        <button class="btn btn-outline" id="editProfileBtn">Edit Profile</button>
-                    </div>
-                </div>
-                <div class="profile-content">
-                    <div class="profile-section">
-                        <h3>Bio</h3>
-                        <p id="profileBio"></p>
-                    </div>
-                    <div class="profile-section">
-                        <h3>Skills I Offer</h3>
-                        <div class="skill-tags" id="profileSkillsOffered"></div>
-                    </div>
-                    <div class="profile-section">
-                        <h3>Skills I Want to Learn</h3>
-                        <div class="skill-tags" id="profileSkillsWanted"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modals -->
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Login to SkillSwap</h3>
-                <button class="modal-close" data-modal="loginModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
+    <!-- Login Page -->
+    <section id="loginPage" class="page hidden">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>Login to SkillSwap</h2>
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginEmail">Email</label>
@@ -197,67 +75,108 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Login</button>
                 </form>
-                <div class="modal-footer">
-                    <p>Don't have an account? <a href="#" id="showRegisterFromLogin">Sign up here</a></p>
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="#" id="showSignupFromLogin">Sign up here</a></p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Register Modal -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Join SkillSwap</h3>
-                <button class="modal-close" data-modal="registerModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="registerForm">
+    <!-- Signup Page -->
+    <section id="signupPage" class="page hidden">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>Join SkillSwap</h2>
+                <form id="signupForm">
                     <div class="form-group">
-                        <label for="registerName">Full Name</label>
-                        <input type="text" id="registerName" required>
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" required>
                     </div>
                     <div class="form-group">
-                        <label for="registerEmail">Email</label>
-                        <input type="email" id="registerEmail" required>
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
                     </div>
                     <div class="form-group">
-                        <label for="registerPassword">Password</label>
-                        <input type="password" id="registerPassword" required>
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    
+                    <!-- Smart Location Input -->
+                    <div class="form-group">
+                        <label for="signupLocation">Location</label>
+                        <div class="location-input-container">
+                            <input type="text" id="signupLocation" placeholder="Start typing your city..." required>
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <div class="location-suggestions" id="locationSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupSkillsOffered">Skills You Can Teach (comma separated)</label>
+                        <input type="text" id="signupSkillsOffered" placeholder="e.g., JavaScript, Guitar, Photography" required>
                     </div>
                     <div class="form-group">
-                        <label for="registerLocation">Location</label>
-                        <input type="text" id="registerLocation" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerBio">Bio</label>
-                        <textarea id="registerBio" rows="3" placeholder="Tell us about yourself..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerSkillsOffered">Skills You Offer (comma separated)</label>
-                        <input type="text" id="registerSkillsOffered" placeholder="e.g., JavaScript, Guitar, Photography">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerSkillsWanted">Skills You Want to Learn (comma separated)</label>
-                        <input type="text" id="registerSkillsWanted" placeholder="e.g., Python, Piano, Cooking">
+                        <label for="signupSkillsWanted">Skills You Want to Learn (comma separated)</label>
+                        <input type="text" id="signupSkillsWanted" placeholder="e.g., Python, Piano, Cooking" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Create Account</button>
                 </form>
-                <div class="modal-footer">
-                    <p>Already have an account? <a href="#" id="showLoginFromRegister">Login here</a></p>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="#" id="showLoginFromSignup">Login here</a></p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Dashboard Page -->
+    <section id="dashboardPage" class="page hidden">
+        <div class="dashboard-container">
+            <!-- User Profile Section -->
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <h2 id="profileName"></h2>
+                        <p id="profileLocation"></p>
+                        <p id="profileEmail"></p>
+                    </div>
+                    <button class="btn btn-outline" id="editProfileBtn">Edit Profile</button>
+                </div>
+                
+                <div class="skills-section">
+                    <div class="skills-group">
+                        <h3>Skills I Can Teach</h3>
+                        <div class="skill-tags" id="skillsOffered"></div>
+                    </div>
+                    <div class="skills-group">
+                        <h3>Skills I Want to Learn</h3>
+                        <div class="skill-tags" id="skillsWanted"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skill Matching Section -->
+            <div class="matching-section">
+                <div class="section-header">
+                    <h2>Find Skill Partners</h2>
+                    <div class="filter-controls">
+                        <input type="text" id="searchSkills" placeholder="Search by skill...">
+                        <select id="locationFilter">
+                            <option value="">All Locations</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="users-grid" id="usersGrid"></div>
+            </div>
+        </div>
+    </section>
 
     <!-- Edit Profile Modal -->
-    <div class="modal" id="editProfileModal">
+    <div class="modal hidden" id="editProfileModal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Edit Profile</h3>
-                <button class="modal-close" data-modal="editProfileModal">
+                <button class="modal-close" id="closeEditModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -267,66 +186,43 @@
                         <label for="editName">Full Name</label>
                         <input type="text" id="editName" required>
                     </div>
+                    
+                    <!-- Smart Location Input for Edit -->
                     <div class="form-group">
                         <label for="editLocation">Location</label>
-                        <input type="text" id="editLocation" required>
+                        <div class="location-input-container">
+                            <input type="text" id="editLocation" placeholder="Start typing your city..." required>
+                            <i class="fas fa-map-marker-alt location-icon"></i>
+                            <div class="location-suggestions" id="editLocationSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editSkillsOffered">Skills You Can Teach</label>
+                        <input type="text" id="editSkillsOffered" required>
                     </div>
                     <div class="form-group">
-                        <label for="editBio">Bio</label>
-                        <textarea id="editBio" rows="3"></textarea>
+                        <label for="editSkillsWanted">Skills You Want to Learn</label>
+                        <input type="text" id="editSkillsWanted" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editSkillsOffered">Skills You Offer (comma separated)</label>
-                        <input type="text" id="editSkillsOffered">
-                    </div>
-                    <div class="form-group">
-                        <label for="editSkillsWanted">Skills You Want to Learn (comma separated)</label>
-                        <input type="text" id="editSkillsWanted">
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+                    <button type="submit" class="btn btn-primary btn-full">Update Profile</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Connection Request Modal -->
-    <div class="modal" id="connectionModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Send Connection Request</h3>
-                <button class="modal-close" data-modal="connectionModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="connection-info" id="connectionInfo"></div>
-                <form id="connectionForm">
-                    <div class="form-group">
-                        <label for="connectionMessage">Message (optional)</label>
-                        <textarea id="connectionMessage" rows="3" placeholder="Hi! I'd love to connect and learn from each other..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">Send Request</button>
-                </form>
-            </div>
+    <!-- Toast Notification -->
+    <div class="toast hidden" id="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
         </div>
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Scripts -->
-    <script src="js/utils/storage.js"></script>
-    <script src="js/utils/validation.js"></script>
-    <script src="js/utils/ui.js"></script>
-    <script src="js/models/User.js"></script>
-    <script src="js/models/Connection.js"></script>
-    <script src="js/models/Chat.js"></script>
-    <script src="js/services/UserService.js"></script>
-    <script src="js/services/MatchService.js"></script>
-    <script src="js/services/ChatService.js"></script>
-    <script src="js/components/UserCard.js"></script>
-    <script src="js/components/SkillTag.js"></script>
-    <script src="js/components/ConnectionGraph.js"></script>
-    <script src="js/app.js"></script>
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="location.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
