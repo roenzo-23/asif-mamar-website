@@ -12,47 +12,27 @@ class SkillSwapApp {
         };
         
         this.isInitialized = false;
-        this.init();
     }
 
     /**
-     * Initialize the application
-     * Sets up all systems and checks for dependencies
+     * Initialize the application - called from DOMContentLoaded
      */
-    async init() {
+    init() {
         console.log('🚀 Initializing SkillSwap Application...');
         
         try {
-            // Wait for DOM to be fully loaded
-            if (document.readyState === 'loading') {
-                await new Promise(resolve => {
-                    document.addEventListener('DOMContentLoaded', resolve);
-                });
-            }
-
-            // Small delay to allow all systems to initialize
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            // Initialize systems in order
-            await this.initializeSystems();
-            
-            // Setup global event listeners
+            // Direct initialization - no async needed
+            this.initializeSystems();
             this.setupGlobalEventListeners();
-            
-            // Setup error handling
             this.setupErrorHandling();
-            
-            // Add responsive design enhancements
             this.setupResponsiveFeatures();
-            
-            // Setup keyboard shortcuts
             this.setupKeyboardShortcuts();
             
             this.isInitialized = true;
             console.log('✅ SkillSwap Application initialized successfully!');
             
             // Show welcome message for first-time users
-            this.checkFirstTimeUser();
+            setTimeout(() => this.checkFirstTimeUser(), 1000);
             
         } catch (error) {
             console.error('❌ Failed to initialize SkillSwap Application:', error);
@@ -63,28 +43,8 @@ class SkillSwapApp {
     /**
      * Initialize all application systems
      */
-    async initializeSystems() {
-        // Wait for all systems to be available with shorter timeout and better checks
-        const maxWaitTime = 2000; // 2 seconds instead of 5
-        const startTime = Date.now();
-        const checkInterval = 50; // Check every 50ms
-        
-        while (!this.areSystemsReady()) {
-            if (Date.now() - startTime > maxWaitTime) {
-                // Log which systems are missing for debugging
-                const missing = [];
-                if (!window.authSystem) missing.push('authSystem');
-                if (!window.locationSystem) missing.push('locationSystem');
-                if (!window.dashboardSystem) missing.push('dashboardSystem');
-                
-                console.warn('Some systems not ready:', missing);
-                // Continue anyway with available systems
-                break;
-            }
-            await new Promise(resolve => setTimeout(resolve, checkInterval));
-        }
-        
-        // Store system references for available systems
+    initializeSystems() {
+        // Store system references - they should be available by now
         this.systems.auth = window.authSystem || null;
         this.systems.location = window.locationSystem || null;
         this.systems.dashboard = window.dashboardSystem || null;
@@ -97,19 +57,6 @@ class SkillSwapApp {
     }
 
     /**
-     * Check if all required systems are ready
-     * @returns {boolean} True if all systems are available
-     */
-    areSystemsReady() {
-        return window.authSystem && 
-               window.locationSystem && 
-               window.dashboardSystem &&
-               window.authSystem.isInitialized &&
-               window.locationSystem.isInitialized &&
-               window.dashboardSystem.isInitialized;
-    }
-
-    /**
      * Setup global event listeners
      */
     setupGlobalEventListeners() {
@@ -117,11 +64,6 @@ class SkillSwapApp {
         window.addEventListener('resize', this.debounce(() => {
             this.handleWindowResize();
         }, 250));
-        
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', (e) => {
-            this.handlePopState(e);
-        });
         
         // Handle online/offline status
         window.addEventListener('online', () => {
@@ -135,11 +77,6 @@ class SkillSwapApp {
         // Handle visibility change (tab switching)
         document.addEventListener('visibilitychange', () => {
             this.handleVisibilityChange();
-        });
-        
-        // Handle before unload (page refresh/close)
-        window.addEventListener('beforeunload', (e) => {
-            this.handleBeforeUnload(e);
         });
 
         console.log('✅ Global event listeners setup complete');
@@ -291,14 +228,6 @@ class SkillSwapApp {
     }
 
     /**
-     * Handle browser navigation (back/forward buttons)
-     */
-    handlePopState(e) {
-        // This would handle SPA routing if implemented
-        console.log('Navigation state changed:', e.state);
-    }
-
-    /**
      * Handle online/offline connection status
      */
     handleConnectionStatus(isOnline) {
@@ -335,15 +264,6 @@ class SkillSwapApp {
     }
 
     /**
-     * Handle before page unload
-     */
-    handleBeforeUnload(e) {
-        // Could save draft data here
-        // For now, just log
-        console.log('Page is about to unload');
-    }
-
-    /**
      * Handle global JavaScript errors
      */
     handleGlobalError(error, filename, lineno) {
@@ -377,6 +297,8 @@ class SkillSwapApp {
      * Handle initialization errors
      */
     handleInitializationError(error) {
+        console.error('Initialization error details:', error);
+        
         // Show basic error message without requiring systems to be loaded
         const errorDiv = document.createElement('div');
         errorDiv.innerHTML = `
@@ -690,17 +612,14 @@ const additionalStyles = `
 // Inject additional styles
 document.head.insertAdjacentHTML('beforeend', additionalStyles);
 
-// Initialize the application
+// Initialize the application when DOM is ready
 let skillSwapApp;
 
-// Initialize immediately if DOM is ready, otherwise wait
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        skillSwapApp = new SkillSwapApp();
-    });
-} else {
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing SkillSwap...');
     skillSwapApp = new SkillSwapApp();
-}
+    skillSwapApp.init();
+});
 
 // Make app globally accessible for debugging
 window.skillSwapApp = skillSwapApp;
@@ -712,8 +631,6 @@ console.log(`
 Available Commands:
 - skillSwapApp.getStatus() - Get app status
 - skillSwapApp.restart() - Restart application
-- authSystem.getCurrentUser() - Get current user
-- dashboardSystem.clearFilters() - Clear all filters
 
 Keyboard Shortcuts:
 - Ctrl+K: Focus search

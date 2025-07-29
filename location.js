@@ -10,13 +10,6 @@ class LocationSuggestionSystem {
         this.debounceTimer = null;
         this.debounceDelay = 300; // milliseconds
         this.isInitialized = false;
-        
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
     }
 
     /**
@@ -386,8 +379,6 @@ class LocationSuggestionSystem {
     }
 }
 
-// Initialize the location suggestion system
+// Initialize and make globally accessible
 let locationSystem = new LocationSuggestionSystem();
-
-// Make locationSystem globally accessible for other modules
 window.locationSystem = locationSystem;

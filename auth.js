@@ -11,13 +11,6 @@ class AuthSystem {
             currentUser: 'skillswap_current_user'
         };
         this.isInitialized = false;
-        
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
     }
 
     /**
@@ -549,8 +542,6 @@ class AuthSystem {
     }
 }
 
-// Initialize authentication system
+// Initialize and make globally accessible
 let authSystem = new AuthSystem();
-
-// Make authSystem globally accessible
 window.authSystem = authSystem;

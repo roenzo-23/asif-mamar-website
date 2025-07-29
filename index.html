@@ -224,5 +224,32 @@
     <script src="location.js"></script>
     <script src="dashboard.js"></script>
     <script src="app.js"></script>
+    
+    <!-- Initialize Systems -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Starting SkillSwap initialization...');
+            
+            // Initialize all systems
+            if (window.authSystem) {
+                window.authSystem.init();
+            }
+            
+            if (window.locationSystem) {
+                window.locationSystem.init();
+            }
+            
+            if (window.dashboardSystem) {
+                window.dashboardSystem.init();
+            }
+            
+            // Initialize main app
+            if (window.skillSwapApp) {
+                window.skillSwapApp.init();
+            }
+            
+            console.log('✅ SkillSwap fully initialized!');
+        });
+    </script>
 </body>
 </html>

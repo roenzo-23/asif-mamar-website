@@ -11,13 +11,6 @@ class DashboardSystem {
         this.searchDebounceTimer = null;
         this.searchDebounceDelay = 500;
         this.isInitialized = false;
-        
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
     }
 
     /**
@@ -537,8 +530,6 @@ class DashboardSystem {
     }
 }
 
-// Initialize dashboard system
+// Initialize and make globally accessible
 let dashboardSystem = new DashboardSystem();
-
-// Make dashboardSystem globally accessible
 window.dashboardSystem = dashboardSystem;
